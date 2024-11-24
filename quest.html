@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Marine Conservation AR Experience - Quest Edition</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.2/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/loglevel/1.8.1/loglevel.min.js"></script>
+    <style>
+        .ui-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+
+    <script>
+        AFRAME.registerComponent('start-experience', {
+            init: function() {
+                const log = window.log.getLogger('start-experience');
+                log.setLevel('debug');
+                
+                this.el.addEventListener('enter-vr', () => {
+                    log.debug('Entered VR/AR mode');
+                    const overlay = document.getElementById('startOverlay');
+                    if (overlay) overlay.classList.add('hidden');
+                });
+
+                this.el.addEventListener('exit-vr', () => {
+                    log.debug('Exited VR/AR mode');
+                    const overlay = document.getElementById('startOverlay');
+                    if (overlay) overlay.classList.remove('hidden');
+                });
+            }
+        });
+
+        AFRAME.registerComponent('interactive-coral', {
+            init: function() {
+                const log = window.log.getLogger('interactive-coral');
+                log.setLevel('debug');
+
+                this.el.addEventListener('click', () => {
+                    log.debug('Coral clicked');
+                    // Change color on click
+                    const currentColor = this.el.getAttribute('material').color;
+                    const newColor = currentColor === '#ff6b6b' ? '#ff9999' : '#ff6b6b';
+                    this.el.setAttribute('material', 'color', newColor);
+                });
+            }
+        });
+
+        AFRAME.registerComponent('hand-tracking', {
+            init: function() {
+                const log = window.log.getLogger('hand-tracking');
+                log.setLevel('debug');
+
+                this.el.addEventListener('controllerconnected', (evt) => {
+                    log.debug('Controller connected:', evt.detail.name);
+                });
+
+                this.el.addEventListener('controllerdisconnected', (evt) => {
+                    log.debug('Controller disconnected:', evt.detail.name);
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="startOverlay" class="ui-overlay">
+        <h2>Marine Conservation AR</h2>
+        <p>Press the menu button on your Quest controller to start</p>
+    </div>
+
+    <a-scene
+        start-experience
+        webxr="optionalFeatures: hit-test, local-floor, bounded-floor, hand-tracking, layers; requiredFeatures: local-floor, bounded-floor; overlayElement: #startOverlay"
+        renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true"
+        cursor="rayOrigin: mouse"
+        raycaster="objects: .clickable"
+        inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+
+        <!-- Environment and Lighting -->
+        <a-entity light="type: ambient; intensity: 0.5"></a-entity>
+        <a-entity light="type: directional; intensity: 0.8; castShadow: true" position="-1 1 0"></a-entity>
+
+        <!-- Ocean Environment -->
+        <a-ocean-plane 
+            material="color: #0066cc; opacity: 0.8; metalness: 0.1; roughness: 0.8"
+            position="0 0 0"
+            rotation="-90 0 0"
+            width="30"
+            height="30">
+        </a-ocean-plane>
+
+        <!-- Coral Reef Scene -->
+        <a-entity position="0 0.5 -2">
+            <!-- Main coral structure -->
+            <a-entity
+                class="clickable"
+                interactive-coral
+                geometry="primitive: box; width: 0.5; height: 0.4; depth: 0.5"
+                material="color: #ff6b6b; metalness: 0.1; roughness: 0.8"
+                position="0 0 0"
+                shadow="cast: true; receive: true">
+            </a-entity>
+
+            <!-- Decorative coral pieces -->
+            <a-entity
+                class="clickable"
+                interactive-coral
+                geometry="primitive: sphere"
+                material="color: #ff9999; metalness: 0.1; roughness: 0.8"
+                position="0.3 0.2 0.2"
+                scale="0.2 0.2 0.2"
+                shadow="cast: true; receive: true">
+            </a-entity>
+
+            <!-- Animated fish -->
+            <a-entity
+                position="0.5 0.5 0"
+                animation="property: position; from: 0.5 0.5 0; to: 0.5 0.5 1; dur: 2000; dir: alternate; loop: true">
+                <a-entity
+                    geometry="primitive: cone; radiusBottom: 0.1; radiusTop: 0"
+                    material="color: #ffeb3b"
+                    rotation="0 0 -90"
+                    scale="0.2 0.2 0.2">
+                </a-entity>
+            </a-entity>
+        </a-entity>
+
+        <!-- Controller Entities -->
+        <a-entity id="leftHand" hand-tracking laser-controls="hand: left" raycaster="objects: .clickable"></a-entity>
+        <a-entity id="rightHand" hand-tracking laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
+
+        <!-- Camera Rig -->
+        <a-entity id="cameraRig" position="0 1.6 0">
+            <a-camera position="0 0 0"></a-camera>
+        </a-entity>
+
+    </a-scene>
+
+    <script>
+        // Initialize global logger
+        const log = window.log.getLogger('main');
+        log.setLevel('debug');
+
+        // Scene initialization
+        const scene = document.querySelector('a-scene');
+        
+        scene.addEventListener('loaded', () => {
+            log.debug('Scene loaded');
+        });
+
+        scene.addEventListener('enter-vr', () => {
+            if (scene.is('vr-mode')) {
+                log.debug('Entered VR mode');
+            }
+        });
+
+        // Handle XR session events
+        scene.addEventListener('sessionstart', () => {
+            log.debug('XR session started');
+        });
+
+        scene.addEventListener('sessionend', () => {
+            log.debug('XR session ended');
+        });
+    </script>
+</body>
+</html>

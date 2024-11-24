@@ -34,12 +34,15 @@
                     log.debug('Entered VR/AR mode');
                     const overlay = document.getElementById('startOverlay');
                     if (overlay) overlay.classList.add('hidden');
-                });
 
-                this.el.addEventListener('exit-vr', () => {
-                    log.debug('Exited VR/AR mode');
-                    const overlay = document.getElementById('startOverlay');
-                    if (overlay) overlay.classList.remove('hidden');
+                    // Reset scene position when entering VR
+                    const scene = document.querySelector('a-scene');
+                    const worldRoot = document.querySelector('#world-root');
+                    if (worldRoot) {
+                        // Position the world slightly in front of the user
+                        worldRoot.setAttribute('position', '0 0 -2');
+                        log.debug('Reset world position');
+                    }
                 });
             }
         });
@@ -51,7 +54,6 @@
 
                 this.el.addEventListener('click', () => {
                     log.debug('Coral clicked');
-                    // Change color on click
                     const currentColor = this.el.getAttribute('material').color;
                     const newColor = currentColor === '#ff6b6b' ? '#ff9999' : '#ff6b6b';
                     this.el.setAttribute('material', 'color', newColor);
@@ -59,18 +61,14 @@
             }
         });
 
-        AFRAME.registerComponent('hand-tracking', {
+        AFRAME.registerComponent('world-root', {
             init: function() {
-                const log = window.log.getLogger('hand-tracking');
+                const log = window.log.getLogger('world-root');
                 log.setLevel('debug');
-
-                this.el.addEventListener('controllerconnected', (evt) => {
-                    log.debug('Controller connected:', evt.detail.name);
-                });
-
-                this.el.addEventListener('controllerdisconnected', (evt) => {
-                    log.debug('Controller disconnected:', evt.detail.name);
-                });
+                
+                // Initialize position
+                this.el.setAttribute('position', '0 0 -2');
+                log.debug('World root initialized');
             }
         });
     </script>
@@ -83,78 +81,77 @@
 
     <a-scene
         start-experience
-        webxr="optionalFeatures: hit-test, local-floor, bounded-floor, hand-tracking, layers; requiredFeatures: local-floor, bounded-floor; overlayElement: #startOverlay"
+        webxr="optionalFeatures: hit-test, local-floor, hand-tracking; requiredFeatures: local-floor;"
         renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true"
         cursor="rayOrigin: mouse"
-        raycaster="objects: .clickable"
-        inspector="url: https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+        raycaster="objects: .clickable">
 
-        <!-- Environment and Lighting -->
-        <a-entity light="type: ambient; intensity: 0.5"></a-entity>
-        <a-entity light="type: directional; intensity: 0.8; castShadow: true" position="-1 1 0"></a-entity>
+        <!-- Main world container -->
+        <a-entity id="world-root" world-root>
+            <!-- Environment and Lighting -->
+            <a-entity light="type: ambient; intensity: 0.5"></a-entity>
+            <a-entity light="type: directional; intensity: 0.8; castShadow: true" position="-1 1 0"></a-entity>
 
-        <!-- Ocean Environment -->
-        <a-ocean-plane 
-            material="color: #0066cc; opacity: 0.8; metalness: 0.1; roughness: 0.8"
-            position="0 0 0"
-            rotation="-90 0 0"
-            width="30"
-            height="30">
-        </a-ocean-plane>
-
-        <!-- Coral Reef Scene -->
-        <a-entity position="0 0.5 -2">
-            <!-- Main coral structure -->
+            <!-- Ocean floor -->
             <a-entity
-                class="clickable"
-                interactive-coral
-                geometry="primitive: box; width: 0.5; height: 0.4; depth: 0.5"
-                material="color: #ff6b6b; metalness: 0.1; roughness: 0.8"
-                position="0 0 0"
-                shadow="cast: true; receive: true">
+                geometry="primitive: plane; width: 5; height: 5"
+                material="color: #0066cc; opacity: 0.8; metalness: 0.1; roughness: 0.8"
+                position="0 -0.5 0"
+                rotation="-90 0 0">
             </a-entity>
 
-            <!-- Decorative coral pieces -->
-            <a-entity
-                class="clickable"
-                interactive-coral
-                geometry="primitive: sphere"
-                material="color: #ff9999; metalness: 0.1; roughness: 0.8"
-                position="0.3 0.2 0.2"
-                scale="0.2 0.2 0.2"
-                shadow="cast: true; receive: true">
-            </a-entity>
-
-            <!-- Animated fish -->
-            <a-entity
-                position="0.5 0.5 0"
-                animation="property: position; from: 0.5 0.5 0; to: 0.5 0.5 1; dur: 2000; dir: alternate; loop: true">
+            <!-- Coral Reef Scene -->
+            <a-entity position="0 0 0">
+                <!-- Main coral structure -->
                 <a-entity
-                    geometry="primitive: cone; radiusBottom: 0.1; radiusTop: 0"
-                    material="color: #ffeb3b"
-                    rotation="0 0 -90"
-                    scale="0.2 0.2 0.2">
+                    class="clickable"
+                    interactive-coral
+                    geometry="primitive: box; width: 0.5; height: 0.4; depth: 0.5"
+                    material="color: #ff6b6b; metalness: 0.1; roughness: 0.8"
+                    position="0 0 0"
+                    shadow="cast: true; receive: true">
+                </a-entity>
+
+                <!-- Decorative coral pieces -->
+                <a-entity
+                    class="clickable"
+                    interactive-coral
+                    geometry="primitive: sphere"
+                    material="color: #ff9999; metalness: 0.1; roughness: 0.8"
+                    position="0.3 0.2 0.2"
+                    scale="0.2 0.2 0.2"
+                    shadow="cast: true; receive: true">
+                </a-entity>
+
+                <!-- Animated fish -->
+                <a-entity
+                    position="0.5 0.5 0"
+                    animation="property: position; from: 0.5 0.5 0; to: 0.5 0.5 1; dur: 2000; dir: alternate; loop: true">
+                    <a-entity
+                        geometry="primitive: cone; radiusBottom: 0.1; radiusTop: 0"
+                        material="color: #ffeb3b"
+                        rotation="0 0 -90"
+                        scale="0.2 0.2 0.2">
+                    </a-entity>
                 </a-entity>
             </a-entity>
         </a-entity>
 
         <!-- Controller Entities -->
-        <a-entity id="leftHand" hand-tracking laser-controls="hand: left" raycaster="objects: .clickable"></a-entity>
-        <a-entity id="rightHand" hand-tracking laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
+        <a-entity id="leftHand" laser-controls="hand: left" raycaster="objects: .clickable"></a-entity>
+        <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
 
         <!-- Camera Rig -->
-        <a-entity id="cameraRig" position="0 1.6 0">
-            <a-camera position="0 0 0"></a-camera>
+        <a-entity id="cameraRig">
+            <a-camera position="0 1.6 0"></a-camera>
         </a-entity>
 
     </a-scene>
 
     <script>
-        // Initialize global logger
         const log = window.log.getLogger('main');
         log.setLevel('debug');
 
-        // Scene initialization
         const scene = document.querySelector('a-scene');
         
         scene.addEventListener('loaded', () => {
@@ -167,7 +164,7 @@
             }
         });
 
-        // Handle XR session events
+        // XR session management
         scene.addEventListener('sessionstart', () => {
             log.debug('XR session started');
         });

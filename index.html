@@ -2,15 +2,20 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Save the reef</title>
+    <title>Reef Viewer - Desktop</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.4.0/dist/aframe-extras.min.js"></script>
     <script src="https://unpkg.com/aframe-orbit-controls@1.3.2/dist/aframe-orbit-controls.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/loglevel/1.8.1/loglevel.min.js"></script>
+    
     <script src="components/linear-animation.js"></script>
+    <script src="components/camera-rig-controller.js"></script>
     <script src="components/bubbles.js"></script>
     <script src="components/caustics.js"></script>
     <script src="components/ocean-shader.js"></script>
+    <script src="components/coral.js"></script>
+    <script src="components/reef-coral-fragments.js"></script>
   </head>
   <body>
     <!-- scene-controller  -->
@@ -20,9 +25,21 @@
         <img id="skybox" src="assets/skybox.png">
         <a-asset-item id="rock-model" src="assets/rock.glb"></a-asset-item>
 
-        <a-asset-item id="coral-acropora-palmata"     src="assets/coral/acropora-palmata.glb"></a-asset-item>
-        <a-asset-item id="coral-agaricia-speciosa"     src="assets/coral/agaricia-speciosa.glb"></a-asset-item>
-        <a-asset-item id="coral-montastrea-cavernosa"     src="assets/coral/montastrea-cavernosa.glb"></a-asset-item>
+        <a-asset-item id="coral-acropora-cervicornis"       src="assets/coral/acropora-cervicornis.glb"></a-asset-item>
+        <a-asset-item id="coral-acropora-palmata"           src="assets/coral/acropora-palmata.glb"></a-asset-item>
+        <a-asset-item id="coral-acropora-prolifera"         src="assets/coral/acropora-prolifera.glb"></a-asset-item>
+        <a-asset-item id="coral-agaricia-speciosa"          src="assets/coral/agaricia-speciosa.glb"></a-asset-item>
+        <a-asset-item id="coral-colpophyllia-natans"        src="assets/coral/colpophyllia-natans.glb"></a-asset-item>
+        <a-asset-item id="coral-dendrogyra-cylindricus"     src="assets/coral/dendrogyra-cylindricus.glb"></a-asset-item>
+        <a-asset-item id="coral-diploria-labyrinthiformis"  src="assets/coral/diploria-labyrinthiformis.glb"></a-asset-item>
+        <a-asset-item id="coral-eusmilia-fastigiata"        src="assets/coral/eusmilia-fastigiata.glb"></a-asset-item>
+        <a-asset-item id="coral-gorgona-ventalina"          src="assets/coral/gorgona-ventalina.glb"></a-asset-item>
+        <a-asset-item id="coral-meandrina-meandrites"       src="assets/coral/meandrina-meandrites.glb"></a-asset-item>
+        <a-asset-item id="coral-millepora-alcicornis"       src="assets/coral/millepora-alcicornis.glb"></a-asset-item>
+        <a-asset-item id="coral-montastrea-cavernosa"       src="assets/coral/montastrea-cavernosa.glb"></a-asset-item>
+        <a-asset-item id="coral-orbicella-curta"            src="assets/coral/orbicella-curta.glb"></a-asset-item>
+        <a-asset-item id="coral-porites-lobata"             src="assets/coral/porites-lobata.glb"></a-asset-item>
+        <a-asset-item id="coral-pseudodiploria-strigosa"    src="assets/coral/pseudodiploria-strigosa.glb"></a-asset-item>
 
       </a-assets>
 
@@ -37,22 +54,24 @@
                material="shader: stationary-caustics; color: #00aaff; transparent: true; blending: additive" shadow="receive: true"></a-circle>
 
       <!-- Water surface -->
-      <a-circle position="0 30 -4" rotation="-90 0 0" radius="200" segments="80" 
+      <a-circle position="0 38 -4" rotation="-90 0 0" radius="200" segments="80" 
                material="shader: water-surface; color: #7AD7F0; transparent: true; side: double"></a-circle>
 
       <!-- Bubble particle system -->
-      <a-entity bubbles="count: 220; color: #e0e0ff; size: 0.02; speed: 0.2; opacity: 0.3" position="-2 -0.1 -3"></a-entity>
+      <a-entity bubbles="count: 220; color: #e0e0ff; size: 0.05; speed: 0.2; opacity: 0.6" position="0 10 0"></a-entity>
 
+      <a-entity id="rock" gltf-model="#rock-model" position="0 -0.1 -1" scale="0.12 0.15 0.12"></a-entity>
 
-      <a-entity id="rock" gltf-model="#rock-model" position="0 -0.391 0" scale="1 1 1">
+      <a-entity id="corals-colony" reef-corals-fragment></a-entity>
+
+<!--       <a-entity id="rock" gltf-model="#rock-model" position="0 -0.391 0" scale="1.5 1.2 1.5">
  
-        <a-entity id="coral0" position="-2.535 6.845 -1.047" scale="5 5 4.8"       rotation="1.709 -45.931 -8.271"  ocean-shader="colorStrength: 0.3; foamColor: #800080; waveHeight: 0.001" gltf-model="#coral-acropora-palmata"></a-entity>
-        <a-entity id="coral1" position="0.397 7.011 2.524"   scale="5 4.5 4.5"     rotation="9.818 -20.034 -2.004"  ocean-shader="colorStrength: 0.2; foamColor: #4169E1; waveHeight: 0.001" gltf-model="#coral-agaricia-speciosa" ></a-entity>
-        <a-entity id="coral2" position="4.485 6.897 -3.354"  scale="5 4.353 6.286" rotation="10 -62 -5"             ocean-shader="colorStrength: 0.15; foamColor: #228B22; waveHeight: 0.001" gltf-model="#coral-montastrea-cavernosa"></a-entity>
-        
-        
 
-      </a-entity>
+      </a-entity> -->
+<!--        <a-entity id="coral0" position="-2.535 7.955 -1.047" scale="20 20 20"   ocean-shader="colorStrength: 0.1; foamColor: #890089; waveHeight: 0.01" gltf-model="#coral-acropora-palmata"></a-entity>
+        <a-entity id="coral1" position="0.397 8.580 2.524"   scale="20 20 20"  ocean-shader="colorStrength: 0.2; foamColor: #4169E1; waveHeight: 0.01" gltf-model="#coral-agaricia-speciosa" ></a-entity>
+        <a-entity id="coral2" position="4.485 8.380 -3.354"  scale="20 20 20"  ocean-shader="colorStrength: 0.15; foamColor: #228B22; waveHeight: 0.01" gltf-model="#coral-montastrea-cavernosa"></a-entity>
+         -->
 
       <a-entity light="type: directional; color: #FFF; intensity: 0.4; target: #rock" position="1 1 1"></a-entity>
 
@@ -63,12 +82,31 @@
       <a-light id="light-floor" type="directional" target="#floor" color="#ffffff" intensity="0.6" position="-1 19 -21" castShadow="true" 
                shadow="mapSize: 2048x2048; bias: -0.001; near: 0.3; far: 50"></a-light>
             
-      <!-- Underwater sky color -->
+<!--       Underwater sky color -->
       <a-sky src="#skybox" ></a-sky>
 
-      <!-- Camera -->
-      <a-entity camera look-controls="enabled: false" orbit-controls="zoomSpeed: 1.5; minDistance: 20; maxDistance: 36; initialPosition: 0 8 28; maxPolarAngle: 80; rotateSpeed: 2">
-      </a-entity>
+       <!-- Camera -->
+<!--        <a-entity camera look-controls="enabled: false" orbit-controls="zoomSpeed: 1.5; minDistance: 28; maxDistance: 35; initialPosition: 0 8 28; maxPolarAngle: 80; rotateSpeed: 0.5"></a-entity> -->
+      
+        <a-entity id="rig">
+          <!-- Orbit camera for non-VR mode -->
+          <a-entity 
+            camera
+            position="0 3 2"
+            look-controls="enabled: false"
+            orbit-controls="
+              enabled: true;
+              target: 0 0 0;
+              zoomSpeed: 1.5;
+              minDistance: 0.3;
+              maxDistance: 5;
+              initialPosition: 0 1 5;
+              maxPolarAngle: 120;
+              rotateSpeed: 0.5"
+          ></a-entity>
+        </a-entity>
+      
+      
 
     </a-scene>
   </body>

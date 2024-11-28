@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Marine Conservation AR Experience - Quest Edition</title>
+    <title>Reef Viewer - AR</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.2/aframe.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/loglevel/1.8.1/loglevel.min.js"></script>
+  
+    <script src="components/linear-animation.js"></script>
+    <script src="components/bubbles.js"></script>
+    <script src="components/caustics.js"></script>
+    <script src="components/ocean-shader.js"></script>
+    <script src="components/coral.js"></script>
+    <script src="components/reef-coral-fragments.js"></script>
+  
+  
     <style>
         .ui-overlay {
             position: fixed;
@@ -23,6 +32,7 @@
             display: none !important;
         }
     </style>
+  
 
     <script>
         AFRAME.registerComponent('start-experience', {
@@ -67,17 +77,22 @@
                 log.setLevel('debug');
                 
                 // Initialize position
-                this.el.setAttribute('position', '0 0 -2');
+                this.el.setAttribute('position', '0 0 -1');
                 log.debug('World root initialized');
             }
         });
-    </script>
+      
+      
+      
+  </script>
+
 </head>
 <body>
-    <div id="startOverlay" class="ui-overlay">
-        <h2>Marine Conservation AR</h2>
+  
+    <!-- <div id="startOverlay" class="ui-overlay">
+        <h2>Save the reef</h2>
         <p>Press the menu button on your Quest controller to start</p>
-    </div>
+    </div> -->
 
     <a-scene
         start-experience
@@ -85,24 +100,61 @@
         renderer="colorManagement: true; physicallyCorrectLights: true; antialias: true"
         cursor="rayOrigin: mouse"
         raycaster="objects: .clickable">
+      
+        <a-assets>
+            <img id="sandTexture" src="assets/sand.jpg">
+<!--             <img id="skybox" src="assets/skybox.png"> -->
+            <a-asset-item id="rock-model" src="assets/rock.glb"></a-asset-item>
+
+            <a-asset-item id="coral-acropora-cervicornis"       src="assets/coral/acropora-cervicornis.glb"></a-asset-item>
+            <a-asset-item id="coral-acropora-palmata"           src="assets/coral/acropora-palmata.glb"></a-asset-item>
+            <a-asset-item id="coral-acropora-prolifera"         src="assets/coral/acropora-prolifera.glb"></a-asset-item>
+            <a-asset-item id="coral-agaricia-speciosa"          src="assets/coral/agaricia-speciosa.glb"></a-asset-item>
+            <a-asset-item id="coral-colpophyllia-natans"        src="assets/coral/colpophyllia-natans.glb"></a-asset-item>
+            <a-asset-item id="coral-dendrogyra-cylindricus"     src="assets/coral/dendrogyra-cylindricus.glb"></a-asset-item>
+            <a-asset-item id="coral-diploria-labyrinthiformis"  src="assets/coral/diploria-labyrinthiformis.glb"></a-asset-item>
+            <a-asset-item id="coral-eusmilia-fastigiata"        src="assets/coral/eusmilia-fastigiata.glb"></a-asset-item>
+            <a-asset-item id="coral-gorgona-ventalina"          src="assets/coral/gorgona-ventalina.glb"></a-asset-item>
+            <a-asset-item id="coral-meandrina-meandrites"       src="assets/coral/meandrina-meandrites.glb"></a-asset-item>
+            <a-asset-item id="coral-millepora-alcicornis"       src="assets/coral/millepora-alcicornis.glb"></a-asset-item>
+            <a-asset-item id="coral-montastrea-cavernosa"       src="assets/coral/montastrea-cavernosa.glb"></a-asset-item>
+            <a-asset-item id="coral-orbicella-curta"            src="assets/coral/orbicella-curta.glb"></a-asset-item>
+            <a-asset-item id="coral-porites-lobata"             src="assets/coral/porites-lobata.glb"></a-asset-item>
+            <a-asset-item id="coral-pseudodiploria-strigosa"    src="assets/coral/pseudodiploria-strigosa.glb"></a-asset-item>
+
+          </a-assets>
 
         <!-- Main world container -->
         <a-entity id="world-root" world-root>
             <!-- Environment and Lighting -->
-            <a-entity light="type: ambient; intensity: 0.5"></a-entity>
-            <a-entity light="type: directional; intensity: 0.8; castShadow: true" position="-1 1 0"></a-entity>
+            <!-- Ambient light to simulate underwater lighting -->
+            <a-light id="light-ambient" type="ambient" color="#0C4B5F" intensity="0.3"></a-light>
+
+            <!-- Directional light to enhance the caustics effect and cast shadows -->
+            <a-light id="light-floor" type="directional" target="#floor" color="#ffffff" 
+                     intensity="0.6" position="-1 19 -21" castshadow="true" 
+                     shadow="mapSize: 2048x2048; bias: -0.001; near: 0.3; far: 50"></a-light>
 
             <!-- Ocean floor -->
-            <a-entity
-                geometry="primitive: plane; width: 5; height: 5"
-                material="color: #0066cc; opacity: 0.8; metalness: 0.1; roughness: 0.8"
-                position="0 -0.5 0"
-                rotation="-90 0 0">
-            </a-entity>
+            <a-circle id="floor"          position="0 0 -4" rotation="-90 0 0" radius="20" segments="60" material="src: #sandTexture; repeat: 5 5" shadow="receive: true"></a-circle>
+            <a-circle id="floor-caustics" position="0 0.01 -4" rotation="-90 0 0" radius="20" segments="60" material="shader: stationary-caustics; color: #00aaff; transparent: true; blending: additive" shadow="receive: true"></a-circle>
+          
+          
+            <a-circle position="0 38 -4" rotation="-90 0 0" radius="200" segments="80" 
+               material="shader: water-surface; color: #7AD7F0; transparent: true; side: double"></a-circle>
+            
+          
+            <a-entity bubbles="count: 220; color: #e0e0ff; size: 0.05; speed: 0.2; opacity: 0.6" position="0 3 0"></a-entity>
+          
+            <a-entity id="rock" gltf-model="#rock-model" position="0 -0.1 -1" scale="0.12 0.15 0.12"></a-entity>
 
-            <!-- Coral Reef Scene -->
+            <a-entity reef-corals-fragment></a-entity>
+            
+
+
+            <!-- Coral Reef Scene
             <a-entity position="0 0 0">
-                <!-- Main coral structure -->
+
                 <a-entity
                     class="clickable"
                     interactive-coral
@@ -112,7 +164,6 @@
                     shadow="cast: true; receive: true">
                 </a-entity>
 
-                <!-- Decorative coral pieces -->
                 <a-entity
                     class="clickable"
                     interactive-coral
@@ -123,7 +174,6 @@
                     shadow="cast: true; receive: true">
                 </a-entity>
 
-                <!-- Animated fish -->
                 <a-entity
                     position="0.5 0.5 0"
                     animation="property: position; from: 0.5 0.5 0; to: 0.5 0.5 1; dur: 2000; dir: alternate; loop: true">
@@ -135,17 +185,20 @@
                     </a-entity>
                 </a-entity>
             </a-entity>
-        </a-entity>
+             -->
 
+        
+        </a-entity>
+      
         <!-- Controller Entities -->
         <a-entity id="leftHand" laser-controls="hand: left" raycaster="objects: .clickable"></a-entity>
         <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable"></a-entity>
 
         <!-- Camera Rig -->
         <a-entity id="cameraRig">
-            <a-camera position="0 1.6 0"></a-camera>
+            <a-camera position="0 3 4"></a-camera>
         </a-entity>
-
+      
     </a-scene>
 
     <script>

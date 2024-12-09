@@ -14,7 +14,7 @@
     <script src="components/caustics.js"></script>
     <script src="components/ocean-shader.js"></script>
     <script src="components/coral.js"></script>
-    <script src="components/reef-coral-fragments.js"></script>
+    <script src="components/load-fragment.js"></script>
   
   
     <style>
@@ -91,10 +91,6 @@
 </head>
 <body>
   
-    <!-- <div id="startOverlay" class="ui-overlay">
-        <h2>Save the reef</h2>
-        <p>Press the menu button on your Quest controller to start</p>
-    </div> -->
 
     <a-scene
         start-experience
@@ -123,7 +119,8 @@
             <a-asset-item id="coral-orbicella-curta"            src="assets/coral/orbicella-curta.glb"></a-asset-item>
             <a-asset-item id="coral-porites-lobata"             src="assets/coral/porites-lobata.glb"></a-asset-item>
             <a-asset-item id="coral-pseudodiploria-strigosa"    src="assets/coral/pseudodiploria-strigosa.glb"></a-asset-item>
-
+            <a-asset-id id="turtle" src="assets/turtle.glb"></a-asset-id>
+            <a-asset-id id="shark" src="assets/shark.glb"></a-asset-id>
           </a-assets>
 
         <!-- Main world container -->
@@ -150,45 +147,8 @@
           
             <a-entity id="rock" gltf-model="#rock-model" position="0 -0.1 -1" scale="0.12 0.15 0.12"></a-entity>
 
-            <a-entity reef-corals-fragment></a-entity>
+            <a-entity load-fragment="src: /reef.html; templateId: reef-corals"></a-entity>
             
-
-
-            <!-- Coral Reef Scene
-            <a-entity position="0 0 0">
-
-                <a-entity
-                    class="clickable"
-                    interactive-coral
-                    geometry="primitive: box; width: 0.5; height: 0.4; depth: 0.5"
-                    material="color: #ff6b6b; metalness: 0.1; roughness: 0.8"
-                    position="0 0 0"
-                    shadow="cast: true; receive: true">
-                </a-entity>
-
-                <a-entity
-                    class="clickable"
-                    interactive-coral
-                    geometry="primitive: sphere"
-                    material="color: #ff9999; metalness: 0.1; roughness: 0.8"
-                    position="0.3 0.2 0.2"
-                    scale="0.2 0.2 0.2"
-                    shadow="cast: true; receive: true">
-                </a-entity>
-
-                <a-entity
-                    position="0.5 0.5 0"
-                    animation="property: position; from: 0.5 0.5 0; to: 0.5 0.5 1; dur: 2000; dir: alternate; loop: true">
-                    <a-entity
-                        geometry="primitive: cone; radiusBottom: 0.1; radiusTop: 0"
-                        material="color: #ffeb3b"
-                        rotation="0 0 -90"
-                        scale="0.2 0.2 0.2">
-                    </a-entity>
-                </a-entity>
-            </a-entity>
-             -->
-
         
         </a-entity>
       

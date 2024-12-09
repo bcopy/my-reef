@@ -14,7 +14,7 @@
     <script src="components/caustics.js"></script>
     <script src="components/ocean-shader.js"></script>
     <script src="components/coral.js"></script>
-    <script src="components/reef-coral-fragments.js"></script>
+    <script src="components/load-fragment.js"></script>
   </head>
   <body>
     <!-- scene-controller  -->
@@ -39,7 +39,8 @@
         <a-asset-item id="coral-orbicella-curta"            src="assets/coral/orbicella-curta.glb"></a-asset-item>
         <a-asset-item id="coral-porites-lobata"             src="assets/coral/porites-lobata.glb"></a-asset-item>
         <a-asset-item id="coral-pseudodiploria-strigosa"    src="assets/coral/pseudodiploria-strigosa.glb"></a-asset-item>
-
+        <a-asset-id id="turtle" src="assets/turtle.glb"></a-asset-id>
+        <a-asset-id id="shark" src="assets/shark.glb"></a-asset-id>
       </a-assets>
 
 
@@ -61,7 +62,7 @@
 
       <a-entity id="rock" gltf-model="#rock-model" position="0 -0.1 -1" scale="0.12 0.15 0.12"></a-entity>
 
-      <a-entity id="corals-colony" reef-corals-fragment></a-entity>
+      <a-entity id="corals-colony" load-fragment="src: /reef.html; templateId: reef-corals"></a-entity>
 
 <!--       <a-entity id="rock" gltf-model="#rock-model" position="0 -0.391 0" scale="1.5 1.2 1.5">
  

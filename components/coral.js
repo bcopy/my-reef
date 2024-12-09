@@ -52,9 +52,9 @@ AFRAME.registerComponent('coral', {
     // Add the ocean shader component
     this.modelEl.setAttribute('ocean-shader', {
       waterColor: '#0000FF',
-      color: '#00FCFF',
+      color: this.data.color,
       waveHeight: 0.005,
-      colorStrength: 0.05
+      colorStrength: this.data.colorStrength
     });
 
     this.el.appendChild(this.modelEl);

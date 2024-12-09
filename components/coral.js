@@ -28,7 +28,11 @@ AFRAME.registerComponent('coral', {
     },
     health: { type: 'number', default: 100 },
     bleaching: { type: 'number', default: 0 },
-    growthIndex: { type: 'number', default: 1.0 }
+    growthIndex: { type: 'number', default: 1.0 },
+    color: { type: 'color', default: '#00FCFF' },
+    waterColor: { type: 'color', default: '#0000FF' },
+    waveHeight: { type: 'number', default: 0.005 },
+    colorStrength: { type: 'number', default: 0.05, min: 0, max: 1}
   },
 
   init: function() {
@@ -48,7 +52,7 @@ AFRAME.registerComponent('coral', {
     // Add the ocean shader component
     this.modelEl.setAttribute('ocean-shader', {
       waterColor: '#0000FF',
-      foamColor: '#00FCFF',
+      color: '#00FCFF',
       waveHeight: 0.005,
       colorStrength: 0.05
     });
@@ -155,5 +159,9 @@ AFRAME.registerPrimitive('a-coral', {
     health: 'coral.health',
     bleaching: 'coral.bleaching',
     growth: 'coral.growthIndex',
+    color: 'coral.color',
+    watercolor: 'coral.waterColor',
+    waveheight: 'coral.waveHeight',
+    colorstrength: 'coral.colorStrength'
   }
 });

@@ -1,7 +1,7 @@
 AFRAME.registerComponent('ocean-shader', {
     schema: {
       waterColor: {type: 'color', default: '#0000FF'},
-      foamColor: {type: 'color', default: '#00FCFF'},
+      color: {type: 'color', default: '#00FCFF'},
       waveHeight: {type: 'number', default: 0.005},
       colorStrength: {type: 'number', default: 0.05, min: 0, max: 1}
     },
@@ -21,7 +21,7 @@ AFRAME.registerComponent('ocean-shader', {
               uniforms: {
                 baseTexture: { value: node.material.map },
                 waterColor: { value: new THREE.Color(data.waterColor) },
-                foamColor: { value: new THREE.Color(data.foamColor) },
+                color: { value: new THREE.Color(data.color) },
                 waveHeight: { value: data.waveHeight },
                 colorStrength: { value: data.colorStrength },
                 time: { value: 0 }
@@ -55,7 +55,7 @@ AFRAME.registerComponent('ocean-shader', {
               fragmentShader: `
                 uniform sampler2D baseTexture;
                 uniform vec3 waterColor;
-                uniform vec3 foamColor;
+                uniform vec3 color;
                 uniform float colorStrength;
                 varying vec2 vUv;
                 varying float vWaveHeight;
@@ -63,7 +63,7 @@ AFRAME.registerComponent('ocean-shader', {
                 void main() {
                   vec4 texColor = texture2D(baseTexture, vUv);
                   
-                  vec3 finalColor = mix(waterColor, foamColor, smoothstep(0.0, 0.5, vWaveHeight + 0.5));
+                  vec3 finalColor = mix(waterColor, color, smoothstep(0.0, 0.5, vWaveHeight + 0.5));
                   
                   gl_FragColor = vec4(mix(texColor.rgb, finalColor, colorStrength), texColor.a);
                 }

@@ -31,7 +31,7 @@ AFRAME.registerComponent('coral', {
     growthIndex: { type: 'number', default: 1.0 },
     color: { type: 'color', default: '#00FCFF' },
     waterColor: { type: 'color', default: '#0000FF' },
-    waveHeight: { type: 'number', default: 0.005 },
+    waveHeight: { type: 'number', default: 0.01 },
     colorStrength: { type: 'number', default: 0.05, min: 0, max: 1}
   },
 
